@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0,viewport-fit=cover">
+    <title>KessK控制中心</title>
+    {% load static %}
+    <script type="text/javascript" src="https://unpkg.com/alibabacloud-iot-device-sdk@1.2.4/dist/alibabacloud-iot-device-sdk.js"></script>
+    <link rel="stylesheet" href="{% static "user/weui/dist/style/weui.css" %}" />
+    <link rel="stylesheet" href="{% static "user/weui/dist/example/example.css" %}"/>
+    <link rel="stylesheet" href="{% static "user/weui/index.css" %}"/>
+</head>
+<body ontouchstart>
+
+<div id="global-loadingToast" class="global-dialogs" style="opacity: 0; display: none;">
+        <div class="weui-mask_transparent" style="z-index: 99999"></div>
+        <div class="weui-toast" style="z-index: 99999">
+            <i class="weui-loading weui-icon_toast"></i>
+            <p class="weui-toast__content">  </p>
+        </div>
+    </div>
+
+<div id="global-successToast" class="global-dialogs" style="opacity: 0; display: none;">
+        <div class="weui-mask_transparent"></div>
+        <div class="weui-toast">
+            <i class="weui-icon-success-no-circle weui-icon_toast"></i>
+            <p class="weui-toast__content"></p>
+        </div>
+    </div>
+
+<div class="js_dialog global-dialogs" id="global-iosDialog2" style="opacity: 0;display: none">
+            <div class="weui-mask"></div>
+            <div class="weui-dialog">
+                <div class="weui-dialog__bd"></div>
+                <div class="weui-dialog__ft">
+                    <a href="javascript:;" class="weui-dialog__btn weui-dialog__btn_primary" id="hideKnowBtn">知道了</a>
+                </div>
+            </div>
+        </div>
+
+<div class="js_dialog" id="update-dialog" style="opacity: 0;display:none">
+        <div class="weui-progress" style="display:none;">
+            <div class="weui-progress__bar">
+                <div class="weui-progress__inner-bar js_progress" style="width: 50%;"></div>
+            </div>
+        </div>
+
+            <div class="weui-mask"></div>
+            <div class="weui-dialog">
+                <div class="weui-dialog__hd"><i class="weui-icon-info weui-icon_msg"></i></div>
+                <div class="weui-dialog__bd"></div>
+                <div class="weui-dialog__ft">
+                    <a href="javascript:;" class="weui-dialog__btn weui-dialog__btn_default cancel-button">取消</a>
+                    <a href="javascript:;" class="weui-dialog__btn weui-dialog__btn_primary confirm-button">确认</a>
+                </div>
+            </div>
+        </div>
+
+<div class="container" id="container"></div>
+
+<script type="text/html" id="tpl_home">
+    <div class="page">
+        <div class="page__bd" style="height: 100%;">
+            <div class="weui-tab">
+                <div class="weui-tab__panel" style="background: #F7F7F7;">
+                    <div class="weui-panel__bd device-list-controller" style="display: ">
+
+                        <!-- Device lists -->
+                        {%  for device in devices %}
+                        <a href="javascript:void(0);" class="weui-media-box weui-media-box_appmsg device-list-view" data-id="device" data-device_name="{{ device.device.device_name }}"
+                           {% if not device.onActive %}
+                               style="opacity: 0.6"
+                           {% endif %}
+                           id="list-{{ device.device.device_name }}">
+                            <div class="weui-media-box__hd device-list"  style="position: relative;margin-right: 10px;">
+                                <img class="weui-media-box__thumb device-cover" src="{% static "user/logo.png" %}" alt="">
+                                {% if new_version_num > device.device.device_version %}
+                                <span class="weui-badge" style="position: absolute;top: -.4em;right: -.4em;">升级</span>
+                                {% endif %}
+                            </div>
+                            <div class="weui-media-box__bd">
+                                <h4 class="weui-media-box__title">{{ device.device_name }}</h4>
+                                <p class="weui-media-box__desc">
+                                    {% if device.onActive %}
+                                    <i class="weui-icon-success device-status-icon"></i><span>在线</span>
+                                    {% else %}
+                                        <i class="weui-icon-cancel device-status-icon"></i><span>离线</span>
+                                    {% endif %}
+                                {% if device.origin_user %}
+                                <span class="share-tips">来自{{ device.origin_user.first_name }}分享的设备</span>
+                                {% endif %}
+                                </p>
+
+                            </div>
+                            <div class="weui-cell__ft switch-label">关</div>
+                            <div class="weui-cell__ft">
+                                <input class="weui-switch device-swith" type="checkbox" {% if not device.onActive %} disabled {% endif %} data-device_id="{{ device.device.device_name }}">
+
+                            </div>
+                        </a>
+                        {% endfor %}
+
+
+
+                    </div>
+                    <div class="weui-panel__bd user-info" style="display: none">
+                        <div class="weui-cell">
+                            <div class="weui-cell__hd" style="position: relative;margin-right: 10px;">
+                                <img src="{{ user.email }}" style="width: 50px;height:auto;display: block">
+                            </div>
+                            <div class="weui-cell__bd">
+                                <p>{{ user.first_name }}</p>
+                                <p style="font-size: 13px;color: #888888;">设备数量 : {{ devices.count }}</p>
+                                <p style="font-size: 13px;color: #888888;">注册时间 : {{ user.date_joined |date:'Y-m-d H:i' }}</p>
+                            </div>
+                        </div>
+
+                        <div class="weui-cells__title">设备列表</div>
+                        {%  for device in devices %}
+                        <div class="weui-cell">
+                                <div class="weui-cell__hd"><label class="weui-label">{{ device.device_name }}</label></div>
+                                <div class="weui-cell__bd">
+                                    <input class="weui-input" type="text" disabled placeholder="" value="{{ device.bind_time |date:'Y-m-d H:i' }}">
+                                </div>
+                            </div>
+                        {% endfor %}
+
+                    <a class="weui-cell weui-cell_access showPicker">
+                                <div class="weui-cell__hd"><label class="weui-label">控制首页</label></div>
+                        {% if user_config.index_device.device.device_name %}
+                            <div class="weui-cell__bd default-index-name" id="default-index-name">
+                                    {{ user_config.index_device.device_name }}
+                                </div>
+                            {% else %}
+                                <div class="weui-cell__bd default-index-name" id="default-index-name">
+                                    默认
+                                </div>
+                        {% endif %}
+                            <div class="weui-cell__ft">
+                            </div>
+                            </a>
+
+
+
+                    </div>
+                </div>
+                <div class="weui-tabbar" style="background: transparent">
+                    <a href="javascript:;" class="weui-tabbar__item weui-bar__item_on" data-nav_id="device-list-controller">
+                    <span style="display: inline-block;position: relative;">
+                        <img src="{% static "user/icons/light-icons.png" %}"  alt="" class="weui-tabbar__icon">
+                        {% if update_device_count > 0 %}
+                        <span class="weui-badge" style="position: absolute;top: -2px;right: -13px;">{{ update_device_count }}</span>
+                        {% endif %}
+                    </span>
+                        <p class="weui-tabbar__label">设备</p>
+                    </a>
+
+                    <a href="javascript:;" class="weui-tabbar__item" data-nav_id="user-info">
+                        <img src="{% static "user/icons/my-icons.png" %}"   alt="" class="weui-tabbar__icon">
+                        <p class="weui-tabbar__label">我</p>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+    <script type="text/javascript">
+        $(function(){
+            if (window.deviceController)
+                window.deviceController.checkDeviceListStatus()
+            $(".device-swith").click(function () {
+        var device_name = $(this).data('device_id')
+        window.deviceController.setCurrentDeviceName(device_name)
+        window.deviceController.switch_device()
+    })
+
+    $(".device-list-view").click(function (event) {
+        if (event.target.nodeName != "INPUT"){
+            console.log($(this).css("opacity"))
+            var id = $(this).data('id');
+            var device_name = $(this).data('device_name')
+            window.deviceController.setCurrentDeviceName(device_name)
+            $("title").html(window.deviceController.getCurrentDeviceNickName());
+            window.pageManager.pageValues = {
+                "update" : window.deviceController.getSholdUpdate()
+            }
+            window.pageManager.go(id);
+            }
+
+    })
+
+
+
+
+    $('.showPicker').on('click', function () {
+        if (window.deviceController)
+            window.deviceController.changeUserIndex()
+    });
+
+
+            $(".weui-tabbar__item").click(function () {
+                $(".weui-tabbar__item").removeClass("weui-bar__item_on")
+                $(this).addClass("weui-bar__item_on")
+                $(".weui-panel__bd").hide()
+                $("."+$(this).data('nav_id')).show()
+
+            })
+
+
+
+
+
+        })
+</script>
+</script>
+
+<script type="text/html" id="tpl_device">
+        <style>
+
+}
+    </style>
+    <div class="page">
+
+
+    <div class="page__bd" style="height: 100%;">
+        <a href="javascript:;" class=" back-to-home"><img src="{% static "user/icons/home.png" %}" class="kessk-back-icons"  ></a>
+        <div class="weui-tab device-main-control-view">
+            <div class="weui-tab__panel" style="text-align:center;">
+                <div class="status-point"></div>
+                <button class="switch-button power-buttons">  OFF</button>
+                <p class="switch-text">灯已关</p>
+            </div>
+            <div class="weui-tabbar no-border-before" style="background: rgba(0,0,0,0.03)!important;height:100px!important;padding-top: 35px!important;">
+                <a href="javascript:;" class="weui-tabbar__item weui-bar__item_on power-buttons">
+                    <span style="display: inline-block;position: relative;">
+                        <img src="{% static "user/icons/power-icons.png" %}" alt="" class="weui-tabbar__icon">
+                    </span>
+                    <p class="weui-tabbar__label switch_status">开</p>
+                </a>
+                <a href="javascript:;" class="weui-tabbar__item" style="opacity:0.5">
+                    <img src="{% static "user/icons/time-icons.png" %}" alt="" class="weui-tabbar__icon">
+                    <p class="weui-tabbar__label">定时</p>
+                </a>
+                <a href="javascript:;" class="weui-tabbar__item" style="opacity:0.5">
+                    <span style="display: inline-block;position: relative;">
+                        <img src="{% static "user/icons/time-count.png" %}" alt="" class="weui-tabbar__icon">
+                        <span class="weui-badge weui-badge_dot" style="position: absolute;top: 0;right: -6px;"></span>
+                    </span>
+                    <p class="weui-tabbar__label">延迟</p>
+                </a>
+                <a href="javascript:;" class="weui-tabbar__item device-setting">
+                    <span style="display: inline-block;position: relative;">
+                        <img src="{% static "user/icons/setting-icons.png" %}" alt="" class="weui-tabbar__icon">
+                        <span class="weui-badge" style="position: absolute;top: -2px;right: -13px;">新</span>
+                        </span>
+                    <p class="weui-tabbar__label">设置</p>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+        $(function(){
+
+            $('.device-setting').on('click', function(){
+
+                window.pageManager.go("device_setting");
+            });
+
+            $('.back-to-home').click(function () {
+                window.pageManager.go("home");
+            });
+
+            $(".power-buttons").click(function () {
+                window.deviceController.devicePanelControl()
+            })
+
+            window.deviceController.changeDevicePanelStatus()
+            if (window.pageManager.pageValues.update)
+                $(".device-setting").find(".weui-badge").show()
+            else
+                $(".device-setting").find(".weui-badge").hide()
+        })
+
+</script>
+</script>
+
+<script type="text/html" id="tpl_device_setting">
+
+        <div class="page input js_show device_setting">
+    <div class="page__hd text-center" id="share-qrcode-content" style="min-height:235px;display:none">
+        <div>
+            <i class="weui-loading kessk-loading"></i>
+            <p class="page__desc text-center kessk-loading">正在获取二维码</p>
+            <img src="" width="200">
+        </div>
+        <p class="page__desc text-center">邀请好友扫码控制开关</p>
+    </div>
+    <div class="page__bd">
+        <div class="weui-cells__title">该设备的名称，例如"卧室电灯开关" "客厅电灯开关"等容易标识的名称</div>
+        <div class="weui-cells weui-cells_form">
+
+            <div class="weui-cell weui-cell_vcode">
+                <div class="weui-cell__hd">
+                    <label class="weui-label">设备名称</label>
+                </div>
+                    <div class="weui-cell__bd">
+                        <input class="weui-input" type="text" id="device-nick_name" placeholder="" required>
+                    </div>
+                    <div class="weui-cell__ft">
+                        <button class="weui-vcode-btn weui-btn_primary kessk-change-botton" type="submit" id="device-ccname-button" >确定</button>
+                    </div>
+            </div>
+
+        <div class="weui-cell" id="device-version">
+                <div class="weui-cell__hd"><label class="weui-label">设备版本</label></div>
+                <div class="weui-cell__bd">
+                    <input class="weui-input" type="text" disabled placeholder="">
+                </div>
+            </div>
+
+        <div class="weui-cell" id="device-from">
+                <div class="weui-cell__hd"><label class="weui-label">设备来源</label></div>
+                <div class="weui-cell__bd">
+                    <input class="weui-input" type="text" disabled placeholder="">
+                </div>
+            </div>
+
+        <div class="weui-cell" id="device-dingding-date">
+                <div class="weui-cell__hd"><label class="weui-label">绑定日期</label></div>
+                <div class="weui-cell__bd">
+                    <input class="weui-input" type="text" disabled placeholder="">
+                </div>
+            </div>
+
+        <div class="weui-cells__title">绑定该设备的用户</div>
+
+        <div class="weui-cell weui-cell_example binding-user-list" style="display:none;">
+                <div class="weui-cell__hd"><img src="" alt="" style="width:20px;margin-right:16px;display:block"></div>
+                <div class="weui-cell__bd">
+                    <p></p>
+                </div>
+                <div class="weui-cell__ft font-size15"></div>
+            </div>
+
+        <div class="weui-cells" id="device-users-list-content">
+
+
+        </div>
+
+        </div>
+        <a href="javascript:;" class="weui-btn weui-btn_primary margin-top35" id="device-update-button">设备升级</a>
+
+        <a href="javascript:;" class="weui-btn weui-btn_warn margin-top35 margin-bt35" id="unbinding-device-button">解绑设备</a>
+
+    </div>
+
+
+
+
+</div>
+<script type="text/javascript">
+        $(function () {
+            window.deviceController.loadingDeviceSettingPage()
+        })
+
+
+</script>
+
+</script>
+
+
+
+
+
+
+</body>
+
+
+<script src="{% static "user/weui/dist/example/zepto.min.js" %}"></script>
+<script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+<script src="https://res.wx.qq.com/open/libs/weuijs/1.2.1/weui.min.js"></script>
+<script src="{% static "user/weui/index.js" %}"></script>
+<script type="text/javascript">
+    var GLOBAL_INDEX = null;
+    var GLOBAL_INDEX_DEVICE_NAME = 0;
+    {% if user_config.index_device.device.device_name %}
+        GLOBAL_INDEX = 'device';
+        GLOBAL_INDEX_DEVICE_NAME = "{{ user_config.index_device.device.device_name }}"
+        var GLOBAL_DEVICE_NAME = "{{ user_config.index_device.device_name }}"
+    {% endif %}
+
+        $(function () {
+
+            var c = iot.device({
+                productKey: '{{ control_device.product_key }}',
+                deviceName: '{{control_device.device_name}}',
+                deviceSecret: '{{control_device.device_secret}}',
+                protocol: 'wss://'   // For https
+            })
+            console.log(window.deviceController)
+            window.deviceController.init(c,"{{control_device.device_name}}",{{device_json | safe}},
+            '/{{ control_device.product_key }}/{{ control_device.device_name }}/user/get',
+                '/{{ control_device.product_key }}/{{ control_device.device_name }}/user/update',
+                {{update_device_count}},"{{ user_config.index_device.device.device_name }}"
+            )
+            console.log(window.deviceController)
+            $("#hideKnowBtn").click(function () {
+                $(this).parents(".js_dialog").fadeOut(200)
+            })
+
+        })
+
+</script>
+
+
+
+
+</html>

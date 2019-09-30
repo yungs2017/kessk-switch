@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+    <link rel="stylesheet" href="https://res.wx.qq.com/open/libs/weui/1.1.3/weui.min.css" />
+    {% load static %}
+    <link rel="stylesheet" href="{% static "device/example.css" %}"/>
+
+    <title>KessK智能设备</title>
+    <style type="text/css">
+        .weui-cell__hd {
+            position: relative;
+        }
+
+        .cell__hd_position {
+            position: absolute;
+            height: 34px;
+            width: 1px;
+            top: 22px;
+            left: 30%;
+            z-index: 2;
+            display: block;
+            border-left: 1px dashed #08b503;
+        }
+
+        .box_ {
+            margin: 40px auto;
+            padding-top: 15px;
+        }
+
+        body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .weui-cell {
+            padding-top: 15px !important;
+            padding-bottom: 15px !important;
+        }
+
+        .title_ {
+            color: #555
+        }
+    </style>
+</head>
+<body ontouchstart background="#ededed" style="background: #ededed">
+
+<div class="weui-msg">
+        <div class="weui-msg__icon-area"><i class="weui-icon-warn weui-icon_msg"></i></div>
+        <div class="weui-msg__text-area">
+            <h2 class="weui-msg__title">二维码已过期</h2>
+            <p class="weui-msg__desc">该分享二维码已经失效，请联系好友重新生成二维码以绑定。</p>
+        </div>
+
+        <div class="weui-msg__opr-area">
+
+        </div>
+        <div class="weui-msg__extra-area">
+            <div class="weui-footer">
+                <p class="weui-footer__links">
+                    <a href="javascript:void(0);" class="weui-footer__link">KessK</a>
+                </p>
+                <p class="weui-footer__text">Copyright © 2019 kessk</p>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

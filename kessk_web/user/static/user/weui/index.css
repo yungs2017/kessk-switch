@@ -1,0 +1,105 @@
+.device-status-icon {
+    font-size: 17px;
+}
+
+.device-cover {
+    width: 100%!important;
+    height: 100%!important;
+}
+
+.switch-label {
+    margin-top: -5px;
+    margin-right: 5px;
+}
+
+.share-tips {
+    font-size: smaller;
+    font-style: italic;
+}
+
+.no-border-before {
+
+}
+
+.no-border-before::before{
+    border: none!important;
+}
+
+.switch-button {
+    width: 150px;
+    height: 150px;
+    border-color: rgba(0, 0, 0, 0.10);
+    background: #fff;
+    border-width: 3px;
+    border-radius: 100%;
+    /*margin-left: 30%;*/
+    margin-top: 35%;
+    font-size: 35px;
+    color: red;
+}
+.switch-button-shadow {
+    box-shadow: 0px 0px 60px #07C160;
+    color: #07C160!important;
+}
+
+.status-point {
+    margin-left: 50%;
+    margin-top: 40%;
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    background: #d9d9d9;
+    border-radius: 100%;
+}
+
+.background-green {
+    background: #07C160!important;
+}
+
+.switch-text {
+    width: 100%;
+    text-align: center;
+    margin-top: 35px;
+    font-size: 20px;
+    font-weight: bold;
+    color: #666;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.margin-top25 {
+    margin-top: 25px;
+}
+
+.margin-top35 {
+    margin-top: 35px;
+}
+.margin-bt35 {
+    margin-bottom: 35px;
+}
+
+.kessk-change-botton {
+    color: #07C160!important;
+    background-color: #F2F2F2!important;
+    padding-left: 25px;
+    padding-right: 25px;
+    /* border: none; */
+    margin-top: 1px;
+    margin-bottom: 1px;
+    /* height: 45px; */
+    /* padding-top: 0px!important; */
+}
+
+.font-size15 {
+    font-size: 15px!important;
+}
+.kessk-back-icons {
+    position: absolute;
+    top: 35%;
+    width: 35px;
+    left: 5px;
+    z-index: 99999;
+    /*opacity: 0.85;*/
+}

@@ -1,0 +1,26 @@
+.idea/
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+env/
+build/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# virtualenv
+.venv
+venv/
+ENV/
+.vscode
+
+# django migrations
+**/migrations/**
+!**/migrations
+!**/migrations/__init__.py
