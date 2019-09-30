@@ -205,14 +205,14 @@ tunnels:
 11. 安装Arduino的MQTT依赖以及 Arduino json依赖，具体请自行搜索。<br> 
 12. 打开项目的 /kessk-devices/kessk-devices.ino 修改头文件的设备名称和产品名称（对应阿里云物联网平台的设备名称和秘钥以及产品名称），连接上烧录器以及ESP8266 进行固件烧录。<br>
 13. 将触控开关连接到SOC的GPIO3（RX），继电器控制线连接到GPIO0。<br>
-14.手机微信内打开：https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx8dc705a03c99a21f&redirect_uri=https://xxx.ngrok2.xiaomiqiu.cn/device/bind/&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect
+14.手机微信内打开：https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx8dc705a03c99a21f&redirect_uri=https://xxx.ngrok2.xiaomiqiu.cn/device/bind/&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect<br> 
 > 上述连接中的：https://xxx.ngrok2.xiaomiqiu.cn 请更改为实际的Django访问连接。
 15. 根据提示绑定以及控制设备体验。<br>
 > 设备进行OTA升级的时候会从固定的地址按照版本号码的规律以及Mac地址搜寻对应的升级固件，请配置kessk-devices中的头文件中的“UPGRADE_URL”为实际的升级包路径。这里我将升级包文件放在了阿里云的OSS中并设置了访问的限制。<br>
-####针对虚拟设备
-为了方便测试提供了python下写的虚拟设备，如果没有实际ESP8266设备在手的可以通过以下的步骤进行体验测试。
-1. 上面的步骤1～9仍然是必须的。
-2. 打开本项目的： /python-virtual-devices/device.py，修改配置内容：
+#### 针对虚拟设备
+为了方便测试提供了python下写的虚拟设备，如果没有实际ESP8266设备在手的可以通过以下的步骤进行体验测试。<br> 
+1. 上面的步骤1～9仍然是必须的。<br> 
+2. 打开本项目的： /python-virtual-devices/device.py，修改配置内容：<br> 
 ```python
     def __init__(self):
         Aliyun.__init__(self,product_key='产品的key',
@@ -220,11 +220,11 @@ tunnels:
                  device_secret='设备秘钥')
         self.name = "Client ESP8266"
 ```
-3. 去阿里云物联网平台创建一个转发规则，主要是将该设备的消息转发到控制端。详细参考：https://help.aliyun.com/document_detail/42734.html
-4. 运行虚拟设备：python device.py
-5.可以在终端下输入 on/off 来模拟控制设备的开关状态。
-6. 手机微信内打开：https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx8dc705a03c99a21f&redirect_uri=https://xxx.ngrok2.xiaomiqiu.cn/device/bind/&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect 进行控制。
-> 上述连接中的：https://xxx.ngrok2.xiaomiqiu.cn 请更改为实际的Django访问连接。
+3. 去阿里云物联网平台创建一个转发规则，主要是将该设备的消息转发到控制端。详细参考：https://help.aliyun.com/document_detail/42734.html<br> 
+4. 运行虚拟设备：python device.py<br> 
+5.可以在终端下输入 on/off 来模拟控制设备的开关状态。<br> 
+6. 手机微信内打开：https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx8dc705a03c99a21f&redirect_uri=https://xxx.ngrok2.xiaomiqiu.cn/device/bind/&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect 进行控制。<br> 
+> 上述连接中的：https://xxx.ngrok2.xiaomiqiu.cn 请更改为实际的Django访问连接。<br> 
 
 ## 功能扩展
 - 延迟开关功能
