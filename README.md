@@ -58,9 +58,10 @@
 
 - DC-DC电源模块，用于稳压/升压/降压。如果转换电源或者ESP8266外围中已经集成则不需要该模块
 
-- 触控开关面板，零售价约为3-8元RMB
+- 触控开关面板，零售价约为3-8元RMB    
   
-##流程原理  
+  
+ ## 流程原理
 - 用户通过扫码或者链接形式访问设备绑定页面（在微信内）
 - 根据提示使得需要配网的设备进入配网状态（smartconfig状态）  
 - 点击配网，使用微信的jssdk调起airkiss原生页面，用户输入当前手机链接的Wi-Fi密码  
@@ -79,7 +80,7 @@
 
 
 ## 服务端（Django）
-###view入口  
+### view入口  
 - /device/bind/ 设备绑定
 - /user/index/ 控制首页
 - /user/share/ 分享绑定页面
@@ -147,8 +148,8 @@
 <img src="https://github.com/yungs2017/kessk-switch/blob/master/images/ip_write.jpg" width="30%">
 
 ### 运行
-1. git clone 
-2. cd 
+1. git clone https://github.com/yungs2017/kessk-switch.git
+2. cd kessk-switch
 3. pip install requirements.txt   
 4. 去阿里云物联网平台创建产品和设备，需要创建两个产品，并且每个设备（ESP8266设备）均需要在阿里云上面创建一个对应的设备。如何创建产品和设备https://help.aliyun.com/document_detail/73728.html
 > 需要针对设备端（ESP8266）和控制端创建产品，产品的名称自定义（下面在Django配置文件中需要使用）。
@@ -199,15 +200,15 @@ tunnels:
 > Product name ：对应设备在阿里云物联网中的product name，上面步骤创建产品时候输入的名称。
 > Device fireware version number ： 设备的固件版本，自定义。
 补充：需要在阿里云物联网平台中创建一条转发规则，将控制端的消息发送给设备，格式按照下面的进行：  
-<img src="https://github.com/yungs2017/kessk-switch/blob/master/images/aliyun-iot-rule.jpg" width="30%">
-10. 安装并打开Arduino IDE，安装ESP8266 的支持，具体请自行搜索。
-11. 安装Arduino的MQTT依赖以及 Arduino json依赖，具体请自行搜索。
-12. 打开项目的 /kessk-devices/kessk-devices.ino 修改头文件的设备名称和产品名称（对应阿里云物联网平台的设备名称和秘钥以及产品名称），连接上烧录器以及ESP8266 进行固件烧录。
-13. 将触控开关连接到SOC的GPIO3（RX），继电器控制线连接到GPIO0。
+<img src="https://github.com/yungs2017/kessk-switch/blob/master/images/aliyun-iot-rule.jpg" width="30%">  
+10. 安装并打开Arduino IDE，安装ESP8266 的支持，具体请自行搜索。<br>
+11. 安装Arduino的MQTT依赖以及 Arduino json依赖，具体请自行搜索。<br> 
+12. 打开项目的 /kessk-devices/kessk-devices.ino 修改头文件的设备名称和产品名称（对应阿里云物联网平台的设备名称和秘钥以及产品名称），连接上烧录器以及ESP8266 进行固件烧录。<br>
+13. 将触控开关连接到SOC的GPIO3（RX），继电器控制线连接到GPIO0。<br>
 14.手机微信内打开：https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx8dc705a03c99a21f&redirect_uri=https://xxx.ngrok2.xiaomiqiu.cn/device/bind/&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect
 > 上述连接中的：https://xxx.ngrok2.xiaomiqiu.cn 请更改为实际的Django访问连接。
-15. 根据提示绑定以及控制设备体验。
-> 设备进行OTA升级的时候会从固定的地址按照版本号码的规律以及Mac地址搜寻对应的升级固件，请配置kessk-devices中的头文件中的“UPGRADE_URL”为实际的升级包路径。这里我将升级包文件放在了阿里云的OSS中并设置了访问的限制。
+15. 根据提示绑定以及控制设备体验。<br>
+> 设备进行OTA升级的时候会从固定的地址按照版本号码的规律以及Mac地址搜寻对应的升级固件，请配置kessk-devices中的头文件中的“UPGRADE_URL”为实际的升级包路径。这里我将升级包文件放在了阿里云的OSS中并设置了访问的限制。<br>
 ####针对虚拟设备
 为了方便测试提供了python下写的虚拟设备，如果没有实际ESP8266设备在手的可以通过以下的步骤进行体验测试。
 1. 上面的步骤1～9仍然是必须的。
