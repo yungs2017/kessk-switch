@@ -1,7 +1,7 @@
 aliyun-python-sdk-core==2.13.9
 aliyun-python-sdk-iot==8.0.0
 aliyunsdkcore==1.0.3
-Django==2.2.5
+Django==2.2.8
 djangorestframework==3.10.2
 requests==2.22.0
 sqlparse==0.3.0
